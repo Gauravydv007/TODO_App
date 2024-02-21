@@ -12,7 +12,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   // reference to hive box
 
   final _myBox = Hive.box('mybox');
@@ -22,15 +21,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-
-
     // if app open first time
-    if(_myBox.get("TODOLIST") == null ){
+    if (_myBox.get("TODOLIST") == null) {
       db.createInitialData();
-
-    }
-
-    else{
+    } else {
       db.loadData();
     }
     // TODO: implement initState
@@ -42,78 +36,67 @@ class _MyHomePageState extends State<MyHomePage> {
   //   ["now we get", false]
   // ];
 
-  void checkBoxChanged( bool? value, int index){
-    setState(() {
-      db.todoList[index][1] = !db.todoList[index][1];
-      
-    },);
+  void checkBoxChanged(bool? value, int index) {
+    setState(
+      () {
+        db.todoList[index][1] = !db.todoList[index][1];
+      },
+    );
 
     db.updateDataBase();
   }
 
-
   void saveNewTask() {
     setState(() {
-      db.todoList.add( [_controller.text, false]);
+      db.todoList.add([_controller.text, false]);
       _controller.clear();
     });
     Navigator.of(context).pop();
-     db.updateDataBase();
+    db.updateDataBase();
   }
 
-  void createTask(){
+  void createTask() {
     showDialog(
-      context: context, 
-      builder: (context) { 
-        return DialogBox(
-           controller: _controller, 
-           onSave: saveNewTask,
+        context: context,
+        builder: (context) {
+          return DialogBox(
+            controller: _controller,
+            onSave: saveNewTask,
             onCancel: () => Navigator.of(context).pop(),
-        );
-
-      }
-      );
+          );
+        });
   }
 
-
-  void deleteTask( int index){
-
+  void deleteTask(int index) {
     setState(() {
       db.todoList.removeAt(index);
     });
-     db.updateDataBase();
-
+    db.updateDataBase();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.cyan.shade100,
       appBar: AppBar(
-       centerTitle: true,
+        centerTitle: true,
         backgroundColor: Colors.cyan,
         title: Text('TO DO'),
-
       ),
-
       floatingActionButton: FloatingActionButton(
-      onPressed: createTask,
-      child: Icon(Icons.add),
-       
-        ),
-
+        onPressed: createTask,
+        child: Icon(Icons.add),
+      ),
       body: ListView.builder(
         itemCount: db.todoList.length,
         itemBuilder: (context, index) {
           return TodoTask(
-            taskName: db.todoList[index][0], 
+            taskName: db.todoList[index][0],
             taskComp: db.todoList[index][1],
             onChanged: (value) => checkBoxChanged(value, index),
             deleteFunction: (context) => deleteTask(index),
-            );
+          );
         },
-      
-
-      
       ),
     );
   }
